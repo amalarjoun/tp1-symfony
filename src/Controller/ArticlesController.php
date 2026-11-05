@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Form\ArticleType;
+use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Article;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,22 +13,32 @@ use App\Repository\ArticleRepository;
 
 class ArticlesController extends AbstractController
 {
-    #[Route('/articles/nouveau', name: 'app_article_nouveau')]
-    public function nouveau(EntityManagerInterface $em): Response
+   #[Route('/articles/nouveau', name: 'app_article_nouveau')]
+    public function nouveau(Request $request, EntityManagerInterface $em): Response
     {
         $article = new Article();
 
-        $article->setTitre('Mon premier article');
-        $article->setContenu('Ceci est le contenu de mon premier article créé avec Doctrine.');
-        $article->setAuteur('Étudiant');
-        $article->setDateCreation(new \DateTime());
-        $article->setPublie(true);
+    // Créer le formulaire
+        $form = $this->createForm(ArticleType::class, $article);
 
-        $em->persist($article);
-        $em->flush();
+    // Traiter les données envoyées
+        $form->handleRequest($request);
 
-        return new Response("Article créé avec l'id : " . $article->getId());
+    // Vérifier si le formulaire est envoyé et valide
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($article);
+            $em->flush();
+
+            $this->addFlash('success', 'Article créé avec succès !');
+
+            return $this->redirectToRoute('app_articles');
     }
+
+    // Afficher le formulaire
+    return $this->render('articles/nouveau.html.twig', [
+        'formulaire' => $form,
+    ]);
+}
 
     
     #[Route('/articles', name: 'app_articles')]
