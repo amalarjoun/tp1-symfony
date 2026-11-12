@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un article{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>✏️ Modifier l'article : {{ article.titre }}</h1>
+
+    {{ form_start(formulaire) }}
+        {{ form_row(formulaire.titre) }}
+        {{ form_row(formulaire.contenu) }}
+        {{ form_row(formulaire.auteur) }}
+        {{ form_row(formulaire.dateCreation) }}
+        {{ form_row(formulaire.publie) }}
+        {{ form_row(formulaire.categorie) }}
+        {{ form_row(formulaire.enregistrer) }}
+    {{ form_end(formulaire) }}
+
+    <a href="{{ path('app_article_detail', {'id': article.id}) }}"
+       class="btn btn-secondary mt-3">
+        Retour aux détails
+    </a>
+</div>
+{% endblock %}
