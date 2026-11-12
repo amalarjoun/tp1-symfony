@@ -3,9 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\ArticleRepository;
+use App\Entity\Categorie;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+
+
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article 
@@ -52,6 +55,9 @@ class Article
 
     #[ORM\Column]
     private ?bool $publie = null;
+
+    #[ORM\ManyToOne(inversedBy: 'articles')]
+    private ?Categorie $categorie = null;
 
     public function getId(): ?int
     {
@@ -115,6 +121,17 @@ class Article
     {
         $this->publie = $publie;
 
+        return $this;
+    }
+
+    public function getCategorie(): ?Categorie
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?Categorie $categorie): static
+    {
+        $this->categorie = $categorie;
         return $this;
     }
 }
