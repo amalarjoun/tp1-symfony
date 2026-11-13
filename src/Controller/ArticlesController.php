@@ -10,13 +10,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\ArticleRepository;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ArticlesController extends AbstractController
 {
    #[Route('/articles/nouveau', name: 'app_article_nouveau')]
+    #[IsGranted('ROLE_USER')]
+
     public function nouveau(Request $request, EntityManagerInterface $em): Response
     {
         $article = new Article();
+        $article->setAuteurUser($this->getUser());
 
     // Créer le formulaire
         $form = $this->createForm(ArticleType::class, $article);
@@ -60,6 +64,14 @@ class ArticlesController extends AbstractController
 #[Route('/articles/{id}/modifier', name: 'app_article_modifier', requirements: ['id' => '\d+'])]
 public function modifier(Article $article, Request $request, EntityManagerInterface $em): Response
 {
+    if (
+        $this->getUser() !== $article->getAuteurUser()
+        && !$this->isGranted('ROLE_ADMIN')
+    ) {
+        throw $this->createAccessDeniedException(
+            "Vous n'êtes pas l'auteur de cet article !"
+        );
+    }
     $form = $this->createForm(ArticleType::class, $article);
 
     $form->handleRequest($request);
