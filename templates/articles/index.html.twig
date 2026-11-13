@@ -5,13 +5,20 @@
 {% block body %}
     <div class="container mt-5">
         <h1 class="mb-4">Liste des articles</h1>
+            {% if is_granted('ROLE_USER') %}
+        <a href="{{ path('app_article_nouveau') }}" class="btn btn-primary mb-3">
+            + Nouvel article
+        </a>
+    {% endif %}
 
         {% if articles is empty %}
             <div class="alert alert-info">
                 Aucun article disponible.
-                <a href="{{ path('app_article_nouveau') }}" class="alert-link">
-                    Créer un article
-                </a>
+               {% if is_granted('ROLE_USER') %}
+                    <a href="{{ path('app_article_nouveau') }}" class="alert-link">
+                        Créer un article
+                    </a>
+                {% endif %}
             </div>
         {% else %}
             <div class="table-responsive">
@@ -23,6 +30,7 @@
                             <th>Auteur</th>
                             <th>Date de création</th>
                             <th>Statut</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
 
@@ -38,6 +46,14 @@
                                         <span class="badge bg-success">Publié</span>
                                     {% else %}
                                         <span class="badge bg-warning text-dark">Brouillon</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if is_granted('ROLE_ADMIN') or app.user == article.auteurUser %}
+                                        <a href="{{ path('app_article_modifier', {'id': article.id}) }}"
+                                        class="btn btn-warning btn-sm">
+                                            Modifier
+                                        </a>
                                     {% endif %}
                                 </td>
                             </tr>
