@@ -17,8 +17,7 @@
 {% for categorie in categories %}
 <div class="col-md-4">
 
-<div class="card h-100 shadow-sm border-0 border-start border-
-primary border-4">
+<div class="card h-100 shadow-sm border-0 border-start border-primary border-4">
 
 <div class="card-body">
 <h3 class="card-title h5 mb-3">{{ categorie.nom }}
@@ -27,6 +26,23 @@ primary border-4">
 <p class="card-text text-muted small">{{
 categorie.description }}</p>
 {% endif %}
+<a href="{{ path('app_categorie_modifier', {'id': categorie.id}) }}"
+   class="btn btn-warning">
+    Modifier
+</a>
+
+<form method="post"
+      action="{{ path('app_categorie_supprimer', {'id': categorie.id}) }}"
+      style="display:inline-block"
+      onsubmit="return confirm('Voulez-vous vraiment supprimer cette catégorie ?');">
+
+    <input type="hidden" name="_token"
+           value="{{ csrf_token('supprimer_' ~ categorie.id) }}">
+
+    <button class="btn btn-danger" type="submit">
+        Supprimer
+    </button>
+</form>
 </div>
 
 <div class="card-footer bg-transparent border-0 pt-0">
