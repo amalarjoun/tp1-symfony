@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\ArticleRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 class ArticlesController extends AbstractController
 {
@@ -44,14 +46,14 @@ class ArticlesController extends AbstractController
     ]);
 }
 
-    
+        
     #[Route('/articles', name: 'app_articles')]
     public function index(ArticleRepository $articleRepository): Response
     {
-        $articles = $articleRepository->findAll();
+        $derniersArticles = $articleRepository->findLastPublished(3);
 
         return $this->render('articles/index.html.twig', [
-            'articles' => $articles,
+            'articles' => $derniersArticles,
         ]);
     }
     #[Route('/articles/{id}', name: 'app_article_detail', requirements: ['id' => '\d+'])]
@@ -108,4 +110,17 @@ public function supprimer(Article $article, Request $request, EntityManagerInter
 
     return $this->redirectToRoute('app_articles');
 }
+    #[Route('/articles/test-email', name: 'app_test_email')]
+    public function testEmail(MailerInterface $mailer): Response
+    {
+        $email = (new Email())
+            ->from('hello@example.com')
+            ->to('you@example.com')
+            ->subject('Nouvel Article !')
+            ->text('Un nouvel article a été publié sur le blog.')
+            ->html('<p>Un nouvel article a été publié sur le blog.</p>');
+            $mailer->send($email);
+
+        return new Response('Email envoyé avec succès !');
+    }
 }
