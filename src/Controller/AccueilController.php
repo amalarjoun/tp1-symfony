@@ -5,16 +5,26 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 final class AccueilController extends AbstractController
 {
-    #[Route('/accueil', name: 'app_accueil')]
-    public function index(): Response
-    {
-        return $this->render('accueil/index.html.twig', [
-            'controller_name' => 'AccueilController',
-        ]);
-    }
+   #[Route('/accueil', name: 'app_accueil')]
+public function index(RequestStack $requestStack): Response
+{
+    $session = $requestStack->getSession();
+
+    // Récupérer le nombre de visites
+    $nbVisites = $session->get('nb_visites', 0);
+
+    // Incrémenter le nombre de visites
+    $session->set('nb_visites', $nbVisites + 1);
+
+    return $this->render('accueil/index.html.twig', [
+        'controller_name' => 'AccueilController',
+        'nbVisites' => $nbVisites + 1,
+    ]);
+}
 #[Route('/bonjour/{prenom}', name: 'app_bonjour')]
 public function bonjour(string $prenom): Response
 {
